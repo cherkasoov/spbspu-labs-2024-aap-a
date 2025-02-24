@@ -1,4 +1,5 @@
 #include "parallelogram.hpp"
+#include "shapeUtils.hpp"
 #include <stdexcept>
 #include <cmath>
 #include <algorithm>
@@ -15,9 +16,9 @@ namespace cherkasov
       {
         throw std::invalid_argument("no correct coordinat the parallelogram");
       }
-      if (!(y1 == y2 || y1 == y3 || y2 == y3))
+      if (!(y1 == y2 || y1 == y3 || y2 == y3) && (y1 != y3))
       {
-        throw std::invalid_argument("sides of the parallelogram must parallel the x");
+        throw std::invalid_argument("incorrect coordinates");
       }
     }
   double Parallelogram::getArea() const
@@ -49,28 +50,17 @@ namespace cherkasov
   }
   void Parallelogram::move(double dx, double dy)
   {
-    vertex1.x += dx;
-    vertex1.y += dy;
-    vertex2.x += dx;
-    vertex2.y += dy;
-    vertex3.x += dx;
-    vertex3.y += dy;
-    vertex4.x += dx;
-    vertex4.y += dy;
+    moveVertex(vertex1, dx, dy);
+    moveVertex(vertex2, dx, dy);
+    moveVertex(vertex3, dx, dy);
+    moveVertex(vertex4, dx, dy);
   }
   void Parallelogram::scale(double k)
   {
-    if (k < 0)
-    {
-      throw std::invalid_argument("k must be positive");
-    }
     point_t center = getFrameRect().pos;
-    vertex1.x = center.x + (vertex1.x - center.x) * k;
-    vertex1.y = center.y + (vertex1.y - center.y) * k;
-    vertex2.x = center.x + (vertex2.x - center.x) * k;
-    vertex2.y = center.y + (vertex2.y - center.y) * k;
-    vertex3.x = center.x + (vertex3.x - center.x) * k;
-    vertex3.y = center.y + (vertex3.y - center.y) * k;
-    vertex4 = {vertex1.x + vertex3.x - vertex2.x, vertex1.y + vertex3.y - vertex2.y};
+    scalePoint(vertex1, center, k);
+    scalePoint(vertex2, center, k);
+    scalePoint(vertex3, center, k);
+    scalePoint(vertex4, center, k);
   }
 }

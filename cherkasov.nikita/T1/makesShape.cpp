@@ -7,16 +7,14 @@ namespace cherkasov
 {
   Rectangle* getRectangle(std::istream& input)
   {
-    double x1 = 0.0;
-    double y1 = 0.0;
-    double x2 = 0.0;
-    double y2 = 0.0;
-    input >> x1 >> y1 >> x2 >> y2;
+    point_t left;
+    point_t right;
+    input >> left.x >> left.y >> right.x >> right.y;
     if (!input)
     {
       throw std::invalid_argument("no input coordinate");
     }
-    return new Rectangle(x1, y1, x2, y2);
+    return new Rectangle(left, right);
   }
   Square* getSquare(std::istream& input)
   {
@@ -39,7 +37,7 @@ namespace cherkasov
     double x3 = 0.0;
     double y3 = 0.0;
     input >> x1 >> y1 >> x2 >> y2 >> x3 >> y3;
-    if (!(input) && !(y1 == y2 || y1 == y3 || y2 == y3))
+    if (!(input))
     {
       throw std::invalid_argument("no correct coordinat the parallelogram");
     }
@@ -54,7 +52,7 @@ namespace cherkasov
     double x3 = 0.0;
     double y3 = 0.0;
     input >> x1 >> y1 >> x2 >> y2 >> x3 >> y3;
-    if (!(input) && ((x1 == x2 && y1 == y2) || (x1 == x3 && y1 == y3) || (x2 == x3 && y2 == y3)))
+    if (!(input))
     {
       throw std::invalid_argument("no input coordinat");
     }
@@ -80,7 +78,7 @@ namespace cherkasov
     }
     else
     {
-      return nullptr;
+      throw std::invalid_argument("incorrect shape");
     }
   }
 }

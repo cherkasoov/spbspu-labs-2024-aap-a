@@ -1,4 +1,5 @@
 #include "square.hpp"
+#include "shapeUtils.hpp"
 #include <stdexcept>
 #include <cmath>
 
@@ -29,25 +30,18 @@ namespace cherkasov
   void Square::move(point_t c)
   {
     point_t currentPos = getFrameRect().pos;
-    double moveX = c.x - currentPos.x;
-    double moveY = c.y - currentPos.y;
-    left.x += moveX;
-    left.y += moveY;
+    double dx = c.x - currentPos.x;
+    double dy = c.y - currentPos.y;
+    move(dx, dy);
   }
   void Square::move(double dx, double dy)
   {
-    left.x += dx;
-    left.y += dy;
+    moveVertex(left, dx, dy);
   }
   void Square::scale(double k)
   {
-    if (k < 0)
-    {
-      throw std::invalid_argument("k must be positive");
-    }
     point_t currentPos = getFrameRect().pos;
     length *= k;
-    left.x = currentPos.x - (length / 2);
-    left.y = currentPos.y - (length / 2);
+    scalePoint(left, currentPos, k);
   }
 }

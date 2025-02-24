@@ -1,17 +1,22 @@
 #include "rectangle.hpp"
+#include "shapeUtils.hpp"
 #include <stdexcept>
 #include <cmath>
 #include <algorithm>
 
 namespace cherkasov
 {
-  Rectangle::Rectangle(double x1, double y1, double x2, double y2)
-  : left {std::min(x1, x2), std::min(y1, y2)},
-    right {std::max(x1, x2), std::max(y1, y2)}
+  Rectangle::Rectangle(point_t left, point_t right)
+  : left(left),
+    right(right)
     {
-      if (x1 >= x2 || y1 >= y2)
+      if (left.x >= right.x || left.y >= right.y)
       {
-        throw std::invalid_argument("no input coordinate rectangle");
+        throw std::invalid_argument("incorrect coordinats");
+      }
+      if (left.x == right.x || left.y == right.y)
+      {
+        throw std::invalid_argument("coordinats must not match");
       }
     }
   double Rectangle::getArea() const
@@ -31,30 +36,19 @@ namespace cherkasov
   void Rectangle::move(point_t c)
   {
     point_t currentPos = getFrameRect().pos;
-    double moveX = c.x - currentPos.x;
-    double moveY = c.y - currentPos.y;
-    left.x += moveX;
-    right.x += moveX;
-    left.y += moveY;
-    right.y += moveY;
+    double dx = c.x - currentPos.x;
+    double dy = c.y - currentPos.y;
+    move(dx, dy);
   }
   void Rectangle::move(double dx, double dy)
   {
-    left.x += dx;
-    right.x += dx;
-    left.y += dy;
-    right.y += dy;
+    moveVertex(left, dx, dy);
+    moveVertex(right, dx, dy);
   }
   void Rectangle::scale(double k)
   {
-    if (k < 0)
-    {
-      throw std::invalid_argument("k must be positive");
-    }
     point_t center = getFrameRect().pos;
-    left.x = center.x + (left.x - center.x) * k;
-    left.y = center.y + (left.y - center.y) * k;
-    right.x = center.x + (right.x - center.x) * k;
-    right.y = center.y + (right.y - center.y) * k;
+    scalePoint(left, center, k);
+    scalePoint(right, center, k);
   }
 }
