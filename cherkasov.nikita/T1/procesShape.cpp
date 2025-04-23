@@ -1,9 +1,7 @@
 #include "procesShape.hpp"
-#include "base-types.hpp"
-#include "rectangle.hpp"
 #include <iostream>
 
-double cherkasov::getSumArea(Shape** shapes, size_t shape)
+double cherkasov::getSumArea(const Shape * const * shapes, size_t shape)
 {
   double totalArea = 0;
   for (size_t i = 0; i < shape; i++)
@@ -12,14 +10,14 @@ double cherkasov::getSumArea(Shape** shapes, size_t shape)
   }
   return totalArea;
 }
-void cherkasov::deleteShapes(Shape** shapes, size_t shape)
+void cherkasov::deleteShapes(Shape ** shapes, size_t shape)
 {
   for (size_t i = 0; i < shape; i++)
   {
     delete shapes[i];
   }
 }
-void cherkasov::getCoordinates(Shape** shapes, size_t shape)
+void cherkasov::getCoordinates(const Shape * const* shapes, size_t shape)
 {
   for (size_t i = 0; i < shape; i++)
   {
@@ -30,19 +28,16 @@ void cherkasov::getCoordinates(Shape** shapes, size_t shape)
     double y2 = rectangle.pos.y + rectangle.height / 2.0;
     std::cout << " " << x1 << " " << y1 << " " << x2 << " " << y2;
   }
-  std::cout << "\n";
 }
-void cherkasov::getScaling(Shape** shapes, size_t shape, point_t p, double scalingFactor)
+void cherkasov::getScaling(Shape ** shapes, size_t shape, point_t p, double k)
 {
   for (size_t i = 0; i < shape; i++)
   {
     point_t startPoint = shapes[i]->getFrameRect().pos;
     shapes[i]->move(p);
     point_t newPoint = shapes[i]->getFrameRect().pos;
-    point_t newVector{};
-    newVector.x = (newPoint.x - startPoint.x) * scalingFactor;
-    newVector.y = (newPoint.y - startPoint.y) * scalingFactor;
-    shapes[i]->scale(scalingFactor);
+    point_t newVector{ (newPoint.x - startPoint.x) * k, (newPoint.y - startPoint.y) * k };
+    shapes[i]->scalingFactor(k);
     shapes[i]->move(-newVector.x, -newVector.y);
   }
 }

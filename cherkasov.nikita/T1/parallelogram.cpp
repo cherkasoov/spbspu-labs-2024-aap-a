@@ -2,42 +2,46 @@
 #include <stdexcept>
 #include <cmath>
 #include <algorithm>
+#include "shapeUtils.hpp"
 
 namespace cherkasov
 {
-  Parallelogram::Parallelogram(double x1, double y1, double x2, double y2, double x3, double y3)
-  : vertex1{x1, y1},
-    vertex2{x2, y2},
-    vertex3{x3, y3},
-    vertex4{(x1 + x3) - x2, (y1 + y3) - y2}
+  Parallelogram::Parallelogram(point_t vertex1, point_t vertex2, point_t vertex3):
+    vertex{ vertex1, vertex2, vertex3, { (vertex1.x + vertex3.x) - vertex2.x, (vertex1.y + vertex3.y) - vertex2.y } }
     {
-      if ((x1 == x3 && y2 == y3) || (x2 == x3 && y1 == y3))
+      bool invalidCoordinat = false;
+      if ((vertex1.x == vertex3.x && vertex2.y == vertex3.y) || (vertex2.x == vertex3.x && vertex1.y == vertex3.y))
+      {
+        invalidCoordinat = true;
+      }
+      if (!(vertex1.y == vertex2.y || vertex1.y == vertex3.y || vertex2.y == vertex3.y) && (vertex1.y != vertex3.y))
+      {
+        invalidCoordinat = true;
+      }
+      if (invalidCoordinat)
       {
         throw std::invalid_argument("no correct coordinat the parallelogram");
-      }
-      if (!(y1 == y2 || y1 == y3 || y2 == y3))
-      {
-        throw std::invalid_argument("sides of the parallelogram must parallel the x");
       }
     }
   double Parallelogram::getArea() const
   {
-    double vector1x = vertex2.x - vertex1.x;
-    double vector1y = vertex2.y - vertex1.y;
-    double vector2x = vertex3.x - vertex1.x;
-    double vector2y = vertex3.y - vertex1.y;
+    double vector1x = vertex[1].x - vertex[0].x;
+    double vector1y = vertex[1].y - vertex[0].y;
+    double vector2x = vertex[2].x - vertex[0].x;
+    double vector2y = vertex[2].y - vertex[0].y;
     return std::abs(vector1x * vector2y - vector1y * vector2x);
   }
   rectangle_t Parallelogram::getFrameRect() const
   {
-    double minX = std::min({vertex1.x, vertex2.x, vertex3.x, vertex4.x});
-    double maxX = std::max({vertex1.x, vertex2.x, vertex3.x, vertex4.x});
-    double minY = std::min({vertex1.y, vertex2.y, vertex3.y, vertex4.y});
-    double maxY = std::max({vertex1.y, vertex2.y, vertex3.y, vertex4.y});
-    point_t center;
-    center.x = (vertex1.x + vertex2.x + vertex3.x + vertex4.x) / 4;
-    center.y = (vertex1.y + vertex2.y + vertex3.y + vertex4.y) / 4;
-    rectangle_t rect{maxX - minX, maxY - minY, center};
+    double minX = std::min({ vertex[0].x, vertex[1].x, vertex[2].x, vertex[3].x });
+    double maxX = std::max({ vertex[0].x, vertex[1].x, vertex[2].x, vertex[3].x });
+    double minY = std::min({ vertex[0].y, vertex[1].y, vertex[2].y, vertex[3].y });
+    double maxY = std::max({ vertex[0].y, vertex[1].y, vertex[2].y, vertex[3].y });
+    point_t center{ (vertex[0].x + vertex[1].x + vertex[2].x + vertex[3].x) / 4,
+      (vertex[0].y + vertex[1].y + vertex[2].y + vertex[3].y) / 4 };
+    double width = maxX - minX;
+    double height = maxY - minY;
+    rectangle_t rect { width, height, center };
     return rect;
   }
   void Parallelogram::move(point_t c)
@@ -49,28 +53,17 @@ namespace cherkasov
   }
   void Parallelogram::move(double dx, double dy)
   {
-    vertex1.x += dx;
-    vertex1.y += dy;
-    vertex2.x += dx;
-    vertex2.y += dy;
-    vertex3.x += dx;
-    vertex3.y += dy;
-    vertex4.x += dx;
-    vertex4.y += dy;
+    moveVertex(vertex[0], dx, dy);
+    moveVertex(vertex[1], dx, dy);
+    moveVertex(vertex[2], dx, dy);
+    moveVertex(vertex[3], dx, dy);
   }
-  void Parallelogram::scale(double k)
+  void Parallelogram::scalingFactor(double k)
   {
-    if (k < 0)
-    {
-      throw std::invalid_argument("k must be positive");
-    }
     point_t center = getFrameRect().pos;
-    vertex1.x = center.x + (vertex1.x - center.x) * k;
-    vertex1.y = center.y + (vertex1.y - center.y) * k;
-    vertex2.x = center.x + (vertex2.x - center.x) * k;
-    vertex2.y = center.y + (vertex2.y - center.y) * k;
-    vertex3.x = center.x + (vertex3.x - center.x) * k;
-    vertex3.y = center.y + (vertex3.y - center.y) * k;
-    vertex4 = {vertex1.x + vertex3.x - vertex2.x, vertex1.y + vertex3.y - vertex2.y};
+    scalePoint(vertex[0], center, k);
+    scalePoint(vertex[1], center, k);
+    scalePoint(vertex[2], center, k);
+    scalePoint(vertex[3], center, k);
   }
 }
